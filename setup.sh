@@ -11,8 +11,7 @@ export NSG_NAME="mynsg"
 export PUBLIC_IP_NAME="mypublicip"
 export ROUTE_TABLE_NAME="myroutetable"
 export ROUTE_NAME="internetroute"
-# Fetch the subscription ID dynamically
-SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+
 
 # Display the variables (optional, to confirm)
 echo "Resource Group: $RESOURCE_GROUP"
@@ -25,4 +24,3 @@ echo "NSG Name: $NSG_NAME"
 echo "Public IP Name: $PUBLIC_IP_NAME"
 echo "Route Table = $ROUTE_TABLE_NAME"
 echo "Route = $ROUTE_NAME"
-echo "Subscription ID: $SUBSCRIPTION_ID"
