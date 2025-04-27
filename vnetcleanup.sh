@@ -10,21 +10,21 @@ NSG_NAME=$(echo "$NSG_NAME" | tr '[:lower:]' '[:upper:]')
 ROUTE_TABLE_NAME=$(echo "$ROUTE_TABLE_NAME" | tr '[:lower:]' '[:upper:]')
 
 # Disassociate NSG from the subnet
-echo "Disassociate NSG from the subnet"
- az network vnet subnet update \
-   --resource-group $RESOURCE_GROUP \
-   --vnet-name $VNET_NAME \
-   --name $SUBNET1_NAME \
-   --network-security-group "$NSG_NAME"
- 
- # Disassociate route table from the subnet
- echo "Disassociate route table from the subnet"
- az network vnet subnet update \
-   --resource-group $RESOURCE_GROUP \
-   --vnet-name $VNET_NAME \
-   --name $SUBNET1_NAME \
-   --route-table "$ROUTE_TABLE_NAME"
-   
+echo "Disassociating NSG from the subnet: $SUBNET1_NAME"
+az network vnet subnet update \
+  --resource-group $RESOURCE_GROUP \
+  --vnet-name $VNET_NAME \
+  --name $SUBNET1_NAME \
+  --network-security-group ""
+
+# Disassociate route table from the subnet
+echo "Disassociating route table from the subnet: $SUBNET1_NAME"
+az network vnet subnet update \
+  --resource-group $RESOURCE_GROUP \
+  --vnet-name $VNET_NAME \
+  --name $SUBNET1_NAME \
+  --route-table ""
+
 # Delete the route table
 echo "Deleting the route table: $ROUTE_TABLE_NAME"
 az network route-table delete \
