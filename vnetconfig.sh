@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load variables from vnet-setup.sh
-source ./vnet-setup.sh
+source ./setup.sh
 
 # Normalize resource names with Azure naming conventions
 RESOURCE_GROUP=$(echo "$RESOURCE_GROUP" | tr '[:lower:]' '[:upper:]')
