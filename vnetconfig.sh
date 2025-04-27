@@ -1,26 +1,40 @@
 #!/bin/bash
 
-# Create resource group
-az group create \
-  --name $RESOURCE_GROUP \
-  --location $LOCATION
+# Load variables from vnet-setup.sh
+source ./vnet-setup.sh
 
-# Create virtual network with subnet
+# Normalize resource names with Azure naming conventions
+RESOURCE_GROUP=$(echo "$RESOURCE_GROUP" | tr '[:lower:]' '[:upper:]')
+VNET_NAME=$(echo "$VNET_NAME" | tr '[:lower:]' '[:upper:]')
+NSG_NAME=$(echo "$NSG_NAME" | tr '[:lower:]' '[:upper:]')
+ROUTE_TABLE_NAME=$(echo "$ROUTE_TABLE_NAME" | tr '[:lower:]' '[:upper:]')
+
+# Retrieve the subscription ID
+SUBSCRIPTION_ID=$(az account show --query id --output tsv)
+
+# Create a resource group
+echo "Creating resource group: $RESOURCE_GROUP in $LOCATION"
+az group create --name $RESOURCE_GROUP --location $LOCATION
+
+# Create a virtual network and a subnet
+echo "Creating virtual network: $VNET_NAME with subnet: $SUBNET1_NAME"
 az network vnet create \
   --resource-group $RESOURCE_GROUP \
   --name $VNET_NAME \
-  --location $LOCATION \
   --address-prefix $VNET_ADDRESS_PREFIX \
   --subnet-name $SUBNET1_NAME \
-  --subnet-prefix $SUBNET1_PREFIX
+  --subnet-prefix $SUBNET1_PREFIX \
+  --location $LOCATION
 
-# Create network security group
+# Create a network security group
+echo "Creating network security group: $NSG_NAME"
 az network nsg create \
   --resource-group $RESOURCE_GROUP \
   --name $NSG_NAME \
   --location $LOCATION
 
 # Add HTTP rule to NSG
+echo "Creating NSG rule to allow HTTP traffic"
 az network nsg rule create \
   --resource-group $RESOURCE_GROUP \
   --nsg-name $NSG_NAME \
@@ -34,20 +48,15 @@ az network nsg rule create \
   --destination-address-prefixes '*' \
   --description "Allow inbound HTTP traffic on port 80"
 
-# Associate NSG with subnet
-az network vnet subnet update \
-  --resource-group $RESOURCE_GROUP \
-  --vnet-name $VNET_NAME \
-  --name $SUBNET1_NAME \
-  --network-security-group $NSG_NAME
-
-# Create route table
+# Create a route table
+echo "Creating route table: $ROUTE_TABLE_NAME"
 az network route-table create \
   --resource-group $RESOURCE_GROUP \
   --name $ROUTE_TABLE_NAME \
   --location $LOCATION
 
-# Add route to route table
+# Add a route to the route table (open to internet)
+echo "Adding route to route table: $ROUTE_TABLE_NAME"
 az network route-table route create \
   --resource-group $RESOURCE_GROUP \
   --route-table-name $ROUTE_TABLE_NAME \
@@ -55,9 +64,17 @@ az network route-table route create \
   --address-prefix 0.0.0.0/0 \
   --next-hop-type Internet
 
-# Associate route table with subnet
+# Debugging: Print the resource IDs being passed
+echo "Using NSG Resource ID: $NSG_RESOURCE_ID"
+echo "Using Route Table Resource ID: $ROUTE_TABLE_RESOURCE_ID"
+
+# Associate the NSG and route table with the subnet
+echo "Associating network $NSG_NAME and $ROUTE_TABLE_NAME with subnet: $SUBNET1_NAME"
 az network vnet subnet update \
   --resource-group $RESOURCE_GROUP \
   --vnet-name $VNET_NAME \
   --name $SUBNET1_NAME \
-  --route-table $ROUTE_TABLE_NAME
+  --network-security-group "$NSG_NAME" \
+  --route-table "$ROUTE_TABLE_NAME"
+
+echo "Azure VNet configuration completed successfully."
