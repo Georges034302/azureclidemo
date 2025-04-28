@@ -64,10 +64,6 @@ az network route-table route create \
   --address-prefix 0.0.0.0/0 \
   --next-hop-type Internet
 
-# Debugging: Print the resource IDs being passed
-echo "Using NSG Resource ID: $NSG_RESOURCE_ID"
-echo "Using Route Table Resource ID: $ROUTE_TABLE_RESOURCE_ID"
-
 # Associate the NSG and route table with the subnet
 echo "Associating network $NSG_NAME and $ROUTE_TABLE_NAME with subnet: $SUBNET1_NAME"
 az network vnet subnet update \
