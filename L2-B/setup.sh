@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Step 1: Define and export temporary variables for Azure setup
-export RESOURCE_GROUP="ResourceGroup$RANDOM"  
+export RESOURCE_GROUP="MyResourceGroup"  
 export LOCATION="australiaeast"
 export VNET_NAME="MyVNet"  
 export CIDR="10.0.0.0/16"
